@@ -1,34 +1,44 @@
 package br.com.redhat.resource;
 
 import br.com.redhat.proto.Movie;
-import io.quarkus.infinispan.client.Remote;
+import br.com.redhat.proto.MovieList;
+import br.com.redhat.service.MovieService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import org.infinispan.client.hotrod.RemoteCache;
+import jakarta.ws.rs.core.Response;
 
-import java.util.concurrent.CompletionStage;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.*;
+
 
 @Path("/movies")
-@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class MovieResource {
 
     @Inject
-    @Remote("movies")
-    RemoteCache<String, Movie> movies; // cache remoto "movies"
-
-    @POST
-    @Path("/{id}")
-    public CompletionStage<String> put(@PathParam("id") String id, Movie movie) {
-        return movies.putAsync(id, movie)
-                .thenApply(prev -> "OK")
-                .exceptionally(Throwable::getMessage);
-    }
+    MovieService service;
 
     @GET
+    public Response listAll() {
+        MovieList result = service.listAllCached();
+        return Response.ok(result).build();
+    }
+
+    @POST
+    @Transactional
+    public Response create(Movie movie) {
+        Movie created = service.create(movie);
+        return Response.ok(created).build();
+    }
+
+
+    @DELETE
     @Path("/{id}")
-    public CompletionStage<Movie> get(@PathParam("id") String id) {
-        return movies.getAsync(id);
+    @Transactional
+    public Response delete(@PathParam("id") Long id) {
+        service.delete(id);
+        return Response.noContent().build();
     }
 }
