@@ -47,8 +47,14 @@ public class MovieService {
     }
 
     public Movie create(Movie movie) {
-        MovieEntity.persist(movie);
+        var movieEntity = new MovieEntity();
 
+        movieEntity.name = movie.name();
+        movieEntity.director = movie.director();
+        movieEntity.year = movie.year();
+        movieEntity.genre = movie.genre();
+
+        MovieEntity.persist(movieEntity);
         invalidateAll();
 
         return movie;
