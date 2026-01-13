@@ -27,6 +27,13 @@ public class MovieResource {
         return Response.ok(result).build();
     }
 
+    @GET
+    @Path("/{id}")
+    public Response getById(@PathParam("id") Long id) {
+        Movie movie = service.getById(id);
+        return Response.ok(movie).build();
+    }
+
     @POST
     @Transactional
     public Response create(Movie movie) {

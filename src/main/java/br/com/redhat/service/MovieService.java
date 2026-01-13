@@ -5,6 +5,7 @@ import br.com.redhat.proto.Movie;
 import br.com.redhat.proto.MovieList;
 import io.quarkus.infinispan.client.Remote;
 import io.quarkus.logging.Log;
+import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.infinispan.client.hotrod.RemoteCache;
@@ -16,11 +17,15 @@ import java.util.concurrent.TimeUnit;
 public class MovieService {
 
     private static final String KEY_ALL = "movies:all";
-    private static final long TTL_MINUTES = 5;
+    private static final String KEY_BY_ID_PREFIX = "movies:id:";
 
     @Inject
     @Remote("movies")
     RemoteCache<String, MovieList> movieListCache;
+
+    @Inject
+    @Remote("movies")
+    RemoteCache<String, Movie> movieCache;
 
     public MovieList listAllCached() {
 
@@ -32,7 +37,7 @@ public class MovieService {
         }
 
         // se nao houver no cache vai no banco
-        List<MovieEntity> movies = MovieEntity.listAll();
+        List<MovieEntity> movies = MovieEntity.listAll(Sort.by("id"));
         var result = new MovieList(
                 movies.stream()
                         .map(e -> new Movie(e.id, e.name, e.director, e.year, e.genre))
@@ -40,10 +45,31 @@ public class MovieService {
         );
 
         // grava no cache
-        movieListCache.put(KEY_ALL, result, TTL_MINUTES, TimeUnit.MINUTES);
+        movieListCache.put(KEY_ALL, result);
 
         Log.info("\nDB MovieList\n");
         return result;
+    }
+
+    public Movie getById(Long id) {
+        String key = KEY_BY_ID_PREFIX + id;
+
+        Movie cached = movieCache.get(key);
+        if (cached != null) {
+            Log.info("\nCached Movie\n");
+            return cached;
+        }
+
+        MovieEntity e = MovieEntity.findById(id);
+        if (e == null) {
+            return null;
+        }
+
+        Movie movie = new Movie(e.id, e.name, e.director, e.year, e.genre);
+        movieCache.put(key, movie);
+
+        Log.info("\nDB Movie\n");
+        return movie;
     }
 
     public MovieEntity create(Movie movie) {
