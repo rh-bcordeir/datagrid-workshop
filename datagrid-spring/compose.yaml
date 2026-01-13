@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgresql
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: cinema
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data:Z
+

@@ -1,5 +1,56 @@
-*
-!target/*-runner
-!target/*-runner.jar
-!target/lib/*
-!target/quarkus-app/*
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+**/README.md
+**/*.md
+
+# IDE files
+**/.idea
+**/.vscode
+**/.project
+**/.classpath
+**/.settings
+**/*.iml
+**/*.ipr
+**/*.iws
+
+# Maven
+**/target/
+**/.mvn/
+**/mvnw
+**/mvnw.cmd
+**/pom.xml.tag
+**/pom.xml.releaseBackup
+**/pom.xml.versionsBackup
+
+# Build artifacts (keep only what's needed for runtime)
+**/target/*
+!**/target/*-runner
+!**/target/*-runner.jar
+!**/target/lib/*
+!**/target/quarkus-app/*
+!**/target/*.jar
+!**/target/classes
+!**/target/test-classes
+
+# Source files (not needed in Docker image)
+**/src/
+
+# Test files
+**/test/
+**/*Test.java
+**/*Tests.java
+
+# Local data
+**/pg_data/
+**/.env
+
+# OS files
+**/.DS_Store
+**/Thumbs.db
+
+# Logs
+**/*.log
