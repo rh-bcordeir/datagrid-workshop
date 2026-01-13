@@ -78,10 +78,10 @@ public class MovieService {
     @Transactional
     public MovieEntity create(Movie movie) {
         MovieEntity e = new MovieEntity();
-        e.setName(movie.name());
-        e.setDirector(movie.director());
-        e.setYear(movie.year());
-        e.setGenre(movie.genre());
+        e.setName(movie.getName());
+        e.setDirector(movie.getDirector());
+        e.setYear(movie.getYear());
+        e.setGenre(movie.getGenre());
 
         MovieEntity saved = movieRepository.save(e);
 
