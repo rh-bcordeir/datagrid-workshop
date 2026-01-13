@@ -1,5 +1,6 @@
 package br.com.redhat.resource;
 
+import br.com.redhat.model.MovieEntity;
 import br.com.redhat.proto.Movie;
 import br.com.redhat.proto.MovieList;
 import br.com.redhat.service.MovieService;
@@ -29,7 +30,7 @@ public class MovieResource {
     @POST
     @Transactional
     public Response create(Movie movie) {
-        Movie created = service.create(movie);
+        MovieEntity created = service.create(movie);
         return Response.ok(created).build();
     }
 

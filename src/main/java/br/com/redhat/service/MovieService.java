@@ -46,7 +46,7 @@ public class MovieService {
         return result;
     }
 
-    public Movie create(Movie movie) {
+    public MovieEntity create(Movie movie) {
         var movieEntity = new MovieEntity();
 
         movieEntity.name = movie.name();
@@ -57,7 +57,7 @@ public class MovieService {
         MovieEntity.persist(movieEntity);
         invalidateAll();
 
-        return movie;
+        return movieEntity;
     }
 
     public void delete(Long id) {
