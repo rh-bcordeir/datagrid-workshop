@@ -14,6 +14,9 @@ public class MovieList {
         this.movies = movies;
     }
 
-    @ProtoField(number = 1) List<Movie> getMovies() {return movies;};
+    @ProtoField(number = 1)
+    public List<Movie> getMovies() {
+        return movies;
+    }
 }
 

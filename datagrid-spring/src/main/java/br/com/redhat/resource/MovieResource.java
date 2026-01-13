@@ -4,7 +4,6 @@ import br.com.redhat.model.MovieEntity;
 import br.com.redhat.dto.Movie;
 import br.com.redhat.dto.MovieList;
 import br.com.redhat.service.MovieService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
