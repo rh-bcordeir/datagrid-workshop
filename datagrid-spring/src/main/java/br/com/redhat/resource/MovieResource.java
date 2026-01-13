@@ -1,8 +1,8 @@
 package br.com.redhat.resource;
 
 import br.com.redhat.model.MovieEntity;
-import br.com.redhat.proto.Movie;
-import br.com.redhat.proto.MovieList;
+import br.com.redhat.dto.Movie;
+import br.com.redhat.dto.MovieList;
 import br.com.redhat.service.MovieService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -2,12 +2,14 @@ package br.com.redhat.service;
 
 import br.com.redhat.model.MovieEntity;
 import br.com.redhat.model.MovieRepository;
-import br.com.redhat.proto.Movie;
-import br.com.redhat.proto.MovieList;
+import br.com.redhat.dto.Movie;
+import br.com.redhat.dto.MovieList;
 import org.infinispan.client.hotrod.RemoteCache;
+import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,85 +19,82 @@ import java.util.List;
 public class MovieService {
 
     private static final Logger log = LoggerFactory.getLogger(MovieService.class);
+
     private static final String KEY_ALL = "movies:all";
     private static final String KEY_BY_ID_PREFIX = "movies:id:";
 
-    private final MovieRepository movieRepository;
+    @Autowired
+    private MovieRepository movieRepository;
+
     private final RemoteCache<String, MovieList> movieListCache;
     private final RemoteCache<String, Movie> movieCache;
 
-    public MovieService(
-            MovieRepository movieRepository,
-            @Qualifier("movieListCache") RemoteCache<String, MovieList> movieListCache,
-            @Qualifier("movieCache") RemoteCache<String, Movie> movieCache) {
-        this.movieRepository = movieRepository;
-        this.movieListCache = movieListCache;
-        this.movieCache = movieCache;
+    public MovieService(RemoteCacheManager cacheManager) {
+        this.movieListCache = cacheManager.getCache("movies");
+        this.movieCache = cacheManager.getCache("movies");
     }
 
+    @Transactional
     public MovieList listAllCached() {
-        // tenta cache
         MovieList cached = movieListCache.get(KEY_ALL);
         if (cached != null) {
-            log.info("\nCached MovieList\n");
+            log.info("Cached MovieList");
             return cached;
         }
 
-        // se nao houver no cache vai no banco
-        List<MovieEntity> movies = movieRepository.findAll();
-        var result = new MovieList(
+        List<MovieEntity> movies = movieRepository.findAll(Sort.by("id"));
+        MovieList result = new MovieList(
                 movies.stream()
-                        .map(e -> new Movie(e.id, e.name, e.director, e.year, e.genre))
+                        .map(e -> new Movie(e.getId(), e.getName(), e.getDirector(), e.getYear(), e.getGenre()))
                         .toList()
         );
 
-        // grava no cache
         movieListCache.put(KEY_ALL, result);
 
-        log.info("\nDB MovieList\n");
+        log.info("DB MovieList");
         return result;
     }
 
+    @Transactional
     public Movie getById(Long id) {
         String key = KEY_BY_ID_PREFIX + id;
 
         Movie cached = movieCache.get(key);
         if (cached != null) {
-            log.info("\nCached Movie\n");
+            log.info("Cached Movie");
             return cached;
         }
 
-        MovieEntity e = movieRepository.findById(id).orElse(null);
-        if (e == null) {
-            return null;
-        }
-
-        Movie movie = new Movie(e.id, e.name, e.director, e.year, e.genre);
-        movieCache.put(key, movie);
-
-        log.info("\nDB Movie\n");
-        return movie;
+        return movieRepository.findById(id)
+                .map(e -> {
+                    Movie movie = new Movie(e.getId(), e.getName(), e.getDirector(), e.getYear(), e.getGenre());
+                    movieCache.put(key, movie);
+                    log.info("DB Movie");
+                    return movie;
+                })
+                .orElse(null);
     }
 
     @Transactional
     public MovieEntity create(Movie movie) {
-        var movieEntity = new MovieEntity();
+        MovieEntity e = new MovieEntity();
+        e.setName(movie.name());
+        e.setDirector(movie.director());
+        e.setYear(movie.year());
+        e.setGenre(movie.genre());
 
-        movieEntity.name = movie.name();
-        movieEntity.director = movie.director();
-        movieEntity.year = movie.year();
-        movieEntity.genre = movie.genre();
+        MovieEntity saved = movieRepository.save(e);
 
-        movieRepository.save(movieEntity);
         invalidateAll();
-
-        return movieEntity;
+        return saved;
     }
 
     @Transactional
     public void delete(Long id) {
         movieRepository.deleteById(id);
+
         invalidateAll();
+        movieCache.remove(KEY_BY_ID_PREFIX + id);
     }
 
     public void invalidateAll() {

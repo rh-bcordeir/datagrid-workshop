@@ -89,6 +89,7 @@ public class MovieService {
     public void delete(Long id) {
         MovieEntity.deleteById(id);
         invalidateAll();
+        movieCache.remove(KEY_BY_ID_PREFIX + id);
     }
 
     public void invalidateAll() {
