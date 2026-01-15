@@ -51,6 +51,30 @@ The application configuration is in `src/main/resources/application.properties`.
 - Username: `developer`
 - Password: `N9FraDcmAEJCnBFx`
 
+### Remote Connection
+
+To remotely connect to a datagrid cluster expose through a passthrough Route add the following properties:
+
+```
+# Infinispan Configuration
+infinispan.remote.server-list=${DATAGRID_HOST}:443
+infinispan.remote.sni-host-name=${DATAGRID_HOST}
+infinispan.client.hotrod.security.ssl.enabled=true
+
+# Truststore (required for TLS)
+infinispan.remote.trust-store-file-name=${PATH_TO_TRUSTSTORE_P12}
+infinispan.remote.trust-store-password=changeit
+infinispan.remote.trust-store-type=PKCS12
+```
+
+And change the @Bean to this:
+``` 
+return (ConfigurationBuilder builder) -> builder
+                .security().ssl().hostnameValidation(false)
+                .clientIntelligence(ClientIntelligence.BASIC)
+                .addContextInitializer(schema);
+```
+
 ## Technologies
 
 - Spring Boot 3.2.0
