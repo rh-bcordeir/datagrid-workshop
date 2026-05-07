@@ -5,9 +5,9 @@ spec:
         - name: datagrid-quarkus
           env:
             - name: INFINISPAN_HOSTS
-              value: "infinispan.my-ns.svc:11222"
+              value: "infinispan.infinispan.svc.cluster.local:11222"
             - name: INFINISPAN_SNI_HOST
-              value: "infinispan.my-ns.svc"
+              value: "infinispan.infinispan.svc.cluster.local"
           volumeMounts:
             - name: infinispan-tls
               mountPath: /deployments/tls
