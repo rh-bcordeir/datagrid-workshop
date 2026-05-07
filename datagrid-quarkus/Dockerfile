@@ -31,7 +31,7 @@ COPY --from=build --chown=185:0 /build/target/quarkus-app/quarkus/  /deployments
 # OpenShift runs containers with an arbitrary UID in group 0 — make /deployments group-writable.
 RUN chgrp -R 0 /deployments && chmod -R g=u /deployments
 
-EXPOSE 8080
+# EXPOSE 8080
 USER 185
 
 ENTRYPOINT [ "/opt/jboss/container/java/run/run-java.sh" ]
