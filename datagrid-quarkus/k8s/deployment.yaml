@@ -1,0 +1,21 @@
+spec:
+  template:
+    spec:
+      containers:
+        - name: datagrid-quarkus
+          env:
+            - name: INFINISPAN_HOSTS
+              value: "infinispan.my-ns.svc:11222"
+            - name: INFINISPAN_SNI_HOST
+              value: "infinispan.my-ns.svc"
+          volumeMounts:
+            - name: infinispan-tls
+              mountPath: /deployments/tls
+              readOnly: true
+      volumes:
+        - name: infinispan-tls
+          secret:
+            secretName: infinispan-cert-secret   # adjust to your secret name
+            items:
+              - key: tls.crt
+                path: tls.crt
