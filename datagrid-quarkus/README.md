@@ -53,6 +53,18 @@ You can then execute your native executable with: `./target/datagrid-workshop-1.
 
 If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
 
+## Infinispan TLS Configuration
+
+If the Infinispan `endpointEncryption` is of type `Service`, the application needs to configure a trust-store to establish a secure connection with the data grid. The relevant properties are:
+
+```properties
+quarkus.infinispan-client.trust-store=${INFINISPAN_TRUSTSTORE:/deployments/tls/tls.crt}
+quarkus.infinispan-client.trust-store-type=${INFINISPAN_TRUSTSTORE_TYPE:pem}
+quarkus.infinispan-client.sni-host-name=${INFINISPAN_SNI_HOST:}
+```
+
+An example showing how to mount the service-signed certificate into the application pod can be found in [k8s/deployment.yaml](k8s/deployment.yaml).
+
 ## Related Guides
 
 - Infinispan Client ([guide](https://quarkus.io/guides/infinispan-client)): Connect to the Infinispan data grid for distributed caching
