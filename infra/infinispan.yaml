@@ -1,0 +1,21 @@
+apiVersion: infinispan.org/v1
+kind: Infinispan
+metadata:
+  name: infinispan
+  namespace: remote-cache
+spec:
+  replicas: 2
+  service:
+    type: DataGrid
+  expose:
+    type: Route
+    host: console-dg.apps.cluster-g6kn4.g6kn4.sandbox1680.opentlc.com
+  container:
+    cpu: "1000m"
+    memory: "2Gi"
+  security:
+    endpointEncryption:
+      type: None
+  resourceLimits:
+    memory: "4Gi"
+    cpu: "2000m"

@@ -1,0 +1,26 @@
+apiVersion: infinispan.org/v2alpha1
+kind: Cache
+metadata:
+  name: presentations
+  namespace: remote-cache
+spec:
+  clusterName: infinispan
+  name: presentations
+  template: |-
+    distributedCache:
+      mode: "SYNC"
+      owners: "1"
+      statistics: "false"
+      encoding:
+        mediaType: "application/x-protostream"
+      persistence:
+        fileStore: ~
+      expiration:
+        lifespan: "1800000"
+      memory:
+        maxSize: "500MB" 
+      transaction:
+        mode: "NONE"
+      stateTransfer:
+        timeout: "15000"
+        chunkSize: "1024"
