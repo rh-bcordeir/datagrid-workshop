@@ -18,6 +18,4 @@ spec:
   container:
     cpu: "1000m"
     memory: "2Gi"
-  security:
-    endpointEncryption:
-      type: None
+
