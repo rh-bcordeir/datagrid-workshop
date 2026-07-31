@@ -5,11 +5,12 @@ metadata:
   namespace: remote-cache
 spec:
   replicas: 2
-  endpointEncryption:
-    certSecretName: infinispan-cert-secret
-    certServiceName: service.beta.openshift.io
-    clientCert: None
-    type: Service
+  security:
+    endpointEncryption:
+      certSecretName: infinispan-cert-secret
+      certServiceName: service.beta.openshift.io
+      clientCert: None
+      type: Service
   service:
     type: DataGrid
   expose:
