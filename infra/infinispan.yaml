@@ -21,6 +21,3 @@ spec:
   security:
     endpointEncryption:
       type: None
-  resourceLimits:
-    memory: "4Gi"
-    cpu: "2000m"
